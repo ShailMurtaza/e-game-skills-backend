@@ -10,7 +10,7 @@ export class OtpService {
             for (const [email, record] of this.otps.entries()) {
                 if (now > record.expiresAt) this.otps.delete(email);
             }
-        }, 10 * 1000); // Check for expired OTPs every 10 seconds
+        }, 60 * 1000); // Check for expired OTPs every minute
     }
 
     generate(email: string): number {

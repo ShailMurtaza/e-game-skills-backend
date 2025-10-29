@@ -90,21 +90,7 @@ export class UsersService {
         return user;
     }
 
-    // Verify otp
-    async verifyOtp(email: string, otp: number) {
-        const user = await this.findOne({ email: email });
-        if (user === null) {
-            throw new BadRequestException('Invalid Email');
-        }
-        if (this.otpService.verify(email, otp)) {
-            this.update(user.id, { verified: true });
-            return { message: 'Verified!' };
-        }
-
-        throw new BadRequestException('Not Matched');
-    }
-
-    // Generate OTP with email
+    // Generate OTP and send it to  email
     async generateOtp(email: string) {
         let user = await this.findOne({ email: email });
         if (!user)
