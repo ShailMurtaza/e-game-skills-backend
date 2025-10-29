@@ -32,6 +32,19 @@ export class UsersController {
         return this.usersService.verifyCredentials(user.email, user.password);
     }
 
+    @Post('verifyOtp')
+    async verifyOtp(
+        @Body('email') email: string,
+        @Body('otp', ParseIntPipe) otp: number,
+    ) {
+        return this.usersService.verifyOtp(email, otp);
+    }
+
+    @Post('generateOtp')
+    async generateOtp(@Body('email') email: string) {
+        return this.usersService.generateOtp(email);
+    }
+
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,

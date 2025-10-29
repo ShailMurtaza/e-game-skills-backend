@@ -23,6 +23,7 @@ model User {
     role    Role
     region_id   Int?
     region  Region?  @relation(fields: [region_id], references: [id])
+    verified    Boolean @default(false)
 }
 
 model Region {
