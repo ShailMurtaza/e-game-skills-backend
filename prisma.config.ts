@@ -8,6 +8,6 @@ export default defineConfig({
     },
     engine: 'classic',
     datasource: {
-        url: 'mysql://mysql:shail012@localhost:3306/e_game_skills',
+        url: env('DATABASE_URL'),
     },
 });
