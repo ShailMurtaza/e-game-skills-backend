@@ -11,6 +11,7 @@ export class UsersService {
         private readonly otpService: OtpService,
     ) {}
 
+    // Create new user
     async create(createUserDto: CreateUserDto) {
         const userDto = await this.findOne({ email: createUserDto.email });
         if (userDto !== null)
@@ -23,10 +24,11 @@ export class UsersService {
                 verified: false, // Always false while creating new user
             },
         });
-        const otp = this.otpService.generate(newUser.email);
+        this.generateOtp(newUser.email);
         return newUser;
     }
 
+    // Find all users using filter
     async findAll(filters?: Record<string, any>) {
         return this.databaseService.user.findMany({
             where: {
@@ -42,6 +44,7 @@ export class UsersService {
         });
     }
 
+    // Find user using filter
     async findOne(filters?: Record<string, any>) {
         return this.databaseService.user.findUnique({
             where: {
@@ -53,6 +56,7 @@ export class UsersService {
         });
     }
 
+    // Update user based on given data
     async update(id: number, updateUserDto: UpdateUserDto) {
         return this.databaseService.user.update({
             where: {
@@ -62,6 +66,7 @@ export class UsersService {
         });
     }
 
+    // Delete User using id
     async remove(id: number) {
         return this.databaseService.user.delete({
             where: {
@@ -70,6 +75,7 @@ export class UsersService {
         });
     }
 
+    // Check user's email and password
     async verifyCredentials(email: string, password: string) {
         const user = await this.findOne({ email: email });
         if (!user)
@@ -81,6 +87,7 @@ export class UsersService {
         return user;
     }
 
+    // Verify otp
     async verifyOtp(email: string, otp: number) {
         const user = await this.findOne({ email: email });
         if (user === null) {
@@ -94,6 +101,7 @@ export class UsersService {
         throw new BadRequestException('Not Matched');
     }
 
+    // Generate OTP with email
     async generateOtp(email: string) {
         let user = await this.findOne({ email: email });
         if (!user)
