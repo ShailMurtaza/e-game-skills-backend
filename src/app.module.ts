@@ -5,9 +5,17 @@ import { DatabaseService } from './database/database.service';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { OtpModule } from './otp/otp.module';
+import { EmailModule } from './email/email.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-    imports: [UsersModule, DatabaseModule, OtpModule],
+    imports: [
+        ConfigModule.forRoot(),
+        UsersModule,
+        DatabaseModule,
+        OtpModule,
+        EmailModule,
+    ],
     controllers: [AppController],
     providers: [AppService, DatabaseService],
 })

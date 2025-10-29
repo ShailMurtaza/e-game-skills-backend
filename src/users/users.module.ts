@@ -3,10 +3,11 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { DatabaseModule } from 'src/database/database.module';
 import { OtpModule } from 'src/otp/otp.module';
+import { EmailModule } from 'src/email/email.module';
 
-// import DatabaseModule and OtpModule to use them in users module
+// import DatabaseModule, EmailModule, OtpModule to use them in users module
 @Module({
-    imports: [DatabaseModule, OtpModule],
+    imports: [DatabaseModule, OtpModule, EmailModule],
     controllers: [UsersController],
     providers: [UsersService],
 })

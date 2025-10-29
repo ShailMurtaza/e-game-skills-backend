@@ -2,6 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { OtpService } from 'src/otp/otp.service';
 import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
+import { EmailService } from 'src/email/email.service';
+import { SendEmailDto } from 'src/email/dto/email.dto';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -9,6 +11,7 @@ export class UsersService {
     constructor(
         private readonly databaseService: DatabaseService,
         private readonly otpService: OtpService,
+        private readonly emailService: EmailService,
     ) {}
 
     // Create new user
@@ -108,6 +111,12 @@ export class UsersService {
             throw new BadRequestException({ message: 'Email not found' });
         if (user.verified === true) return { messsage: 'Alread verified' };
         const otp = this.otpService.generate(email);
+        const sendEmailDto: SendEmailDto = {
+            recipients: [user.email],
+            subject: 'E Game Skills - OTP',
+            html: `Your OTP is: <strong>${otp}</strong>`,
+        };
+        this.emailService.sendEmail(sendEmailDto);
         return { message: 'Check your Email' };
     }
 }
