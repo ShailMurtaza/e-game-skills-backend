@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://mysql:shail012@localhost:3306/e_game_skills"
+}
+
+model User {
+    id  Int @id @default(autoincrement())
+    username    String
+    email   String  @unique
+    password    String
+    role    Role
+    region_id   Int?
+    region  Region?  @relation(fields: [region_id], references: [id])
+}
+
+model Region {
+  id     Int     @id @default(autoincrement())
+  name   String
+  users  User[]   // one region → many users
+}
+
+enum Role {
+    player
+    team
+    admin
+}
