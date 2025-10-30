@@ -8,6 +8,8 @@ import {
     Delete,
     ParseIntPipe,
     Query,
+    UseGuards,
+    Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -15,6 +17,10 @@ import {
     ResetPasswordDto,
     UpdateUserDto,
 } from './dto/create-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from 'generated/prisma/enums';
 
 @Controller('users')
 export class UsersController {
@@ -37,7 +43,7 @@ export class UsersController {
     }
 
     @Post('verify')
-    async findOne(@Body() user: { email: string; password: string }) {
+    async Verify(@Body() user: { email: string; password: string }) {
         return this.usersService.verifyCredentials(user.email, user.password);
     }
 
@@ -57,5 +63,23 @@ export class UsersController {
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.remove(id);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('profile')
+    async getProfile(@Req() req: any) {
+        return 'User Id: ' + req.user.userId;
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.admin)
+    @Get('admin')
+    async getAdmin(@Req() req: any) {
+        return 'Welcome Admin';
+    }
+
+    @Get(':id')
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.usersService.findOne({ id: id });
     }
 }

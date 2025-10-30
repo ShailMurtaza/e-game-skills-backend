@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -19,9 +23,13 @@ export class AuthService {
         );
         if (user) {
             if (user.verified === false) {
-                throw new BadRequestException('Verify Email Address');
+                throw new UnauthorizedException('Verify Email Address');
             }
-            const payload = { id: user.id, username: user.username };
+            const payload = {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+            };
             const accessToken = this.jwtService.sign(payload);
             return {
                 accessToken,
