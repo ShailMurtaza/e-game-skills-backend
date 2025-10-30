@@ -10,7 +10,11 @@ import {
     Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
+import {
+    CreateUserDto,
+    ResetPasswordDto,
+    UpdateUserDto,
+} from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -20,6 +24,11 @@ export class UsersController {
     async create(@Body() createUserDto: CreateUserDto) {
         await this.usersService.create(createUserDto);
         return { message: 'User created successfully' };
+    }
+
+    @Post('reset-password')
+    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        return this.usersService.resetPassword(resetPasswordDto);
     }
 
     @Get()
@@ -32,7 +41,7 @@ export class UsersController {
         return this.usersService.verifyCredentials(user.email, user.password);
     }
 
-    @Post('generateOtp')
+    @Post('generate-otp')
     async generateOtp(@Body('email') email: string) {
         return this.usersService.generateOtp(email);
     }

@@ -20,11 +20,11 @@ export class AuthController {
     }
 
     @HttpCode(HttpStatus.OK)
-    @Post('verifyOtp')
+    @Post('verify-user')
     async verifyOtp(
         @Body('email') email: string,
         @Body('otp', ParseIntPipe) otp: number,
     ) {
-        return this.authService.verifyOtp(email, otp);
+        return this.authService.verifyUser(email, otp);
     }
 }

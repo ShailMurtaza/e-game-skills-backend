@@ -30,8 +30,8 @@ export class AuthService {
         }
     }
 
-    // Verify otp
-    async verifyOtp(email: string, otp: number) {
+    // Verify user using otp and email
+    async verifyUser(email: string, otp: number) {
         const user = await this.usersService.findOne({ email: email });
         if (user === null) {
             throw new BadRequestException('Invalid Email');

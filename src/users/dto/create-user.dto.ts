@@ -5,6 +5,7 @@ import {
     IsOptional,
     IsString,
     IsBoolean,
+    IsNumber,
 } from 'class-validator';
 import { Role } from 'generated/prisma/client';
 
@@ -53,4 +54,15 @@ export class UpdateUserDto {
     @IsOptional()
     @IsBoolean()
     verified?: boolean;
+}
+
+export class ResetPasswordDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    password: string;
+
+    @IsNumber()
+    otp: number;
 }

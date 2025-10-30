@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -22,10 +22,14 @@ export class OtpService {
 
     verify(email: string, inputCode: number): boolean {
         const record = this.otps.get(email);
-        if (!record) return false;
+        if (!record)
+            throw new BadRequestException('OTP not found. Regenerate OTP.');
         const expired = Date.now() > record.expiresAt;
         const valid = record.code === inputCode;
-        if (expired || !valid) return false;
+        if (expired)
+            throw new BadRequestException('OTP expired. Regenerate OTP.');
+        if (!valid) throw new BadRequestException('Invalid OTP');
+
         this.otps.delete(email); // one-time use
         return true;
     }
