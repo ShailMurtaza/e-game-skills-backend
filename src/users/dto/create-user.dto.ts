@@ -7,7 +7,7 @@ import {
     IsBoolean,
     IsNumber,
 } from 'class-validator';
-import { Role } from 'generated/prisma/client';
+import { Provider, Role } from 'generated/prisma/client';
 
 export class CreateUserDto {
     @IsString()
@@ -16,31 +16,8 @@ export class CreateUserDto {
     @IsEmail()
     email: string;
 
-    @IsString()
-    password: string;
-
-    @IsEnum(Role)
-    role: Role;
-
-    @IsOptional()
-    @IsInt()
-    region_id?: number;
-
-    @IsOptional()
-    @IsBoolean()
-    verified?: boolean;
-}
-
-export class UpdateUserDto {
     @IsOptional()
     @IsString()
-    username?: string;
-
-    @IsOptional()
-    @IsEmail()
-    email?: string;
-
-    @IsOptional()
     password?: string;
 
     @IsOptional()
@@ -54,6 +31,48 @@ export class UpdateUserDto {
     @IsOptional()
     @IsBoolean()
     verified?: boolean;
+
+    @IsOptional()
+    @IsEnum(Provider)
+    provider?: Provider;
+
+    @IsOptional()
+    @IsString()
+    providerId?: string;
+}
+
+export class UpdateUserDto {
+    @IsOptional()
+    @IsString()
+    username?: string;
+
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    password?: string;
+
+    @IsOptional()
+    @IsEnum(Role)
+    role?: Role;
+
+    @IsOptional()
+    @IsInt()
+    region_id?: number; // ← now safe
+
+    @IsOptional()
+    @IsBoolean()
+    verified?: boolean;
+
+    @IsOptional()
+    @IsEnum(Provider)
+    provider?: Provider;
+
+    @IsOptional()
+    @IsString()
+    providerId?: string;
 }
 
 export class ResetPasswordDto {

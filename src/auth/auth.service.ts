@@ -7,6 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from 'src/otp/otp.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,20 @@ export class AuthService {
         private readonly otpService: OtpService,
     ) {}
 
-    async login(loginDto: LoginDto) {
+    async createJwtToken(user) {
+        const payload = {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+        };
+        const accessToken = this.jwtService.sign(payload);
+        return {
+            accessToken,
+            userId: user.id,
+        };
+    }
+
+    async localLogin(loginDto: LoginDto) {
         const user = await this.usersService.verifyCredentials(
             loginDto.email,
             loginDto.password,
@@ -25,16 +39,16 @@ export class AuthService {
             if (user.verified === false) {
                 throw new UnauthorizedException('Verify Email Address');
             }
-            const payload = {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-            };
-            const accessToken = this.jwtService.sign(payload);
-            return {
-                accessToken,
-                userId: user.id,
-            };
+            return this.createJwtToken(user);
+        }
+    }
+
+    async OAuthLogin(user_id: number) {
+        const user = await this.usersService.findOne({
+            id: user_id,
+        });
+        if (user) {
+            return this.createJwtToken(user);
         }
     }
 
@@ -50,5 +64,14 @@ export class AuthService {
         }
 
         throw new BadRequestException('Not Matched');
+    }
+
+    async validateGoogleUser(googleUser: CreateUserDto) {
+        const user = await this.usersService.findOne({
+            email: googleUser.email,
+        });
+
+        if (user) return user;
+        return await this.usersService.createOAuthUser(googleUser);
     }
 }

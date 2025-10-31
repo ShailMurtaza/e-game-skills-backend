@@ -19,7 +19,10 @@ export class UsersService {
     ) {}
 
     // Create new user
-    async create(createUserDto: CreateUserDto, signup = true) {
+    async createLocalUser(createUserDto: CreateUserDto, signup = true) {
+        if (!createUserDto.password) {
+            throw new BadRequestException('Password Not Found');
+        }
         // User can't just create an admin account by passing role as admin
         if (signup && createUserDto.role === 'admin')
             throw new BadRequestException('Invalid Role');
@@ -35,6 +38,21 @@ export class UsersService {
             },
         });
         this.generateOtp(newUser.email);
+        return newUser;
+    }
+
+    // Create new user
+    async createOAuthUser(createUserDto: CreateUserDto) {
+        // User can't just create an admin account by passing role as admin
+        const userDto = await this.findOne({ email: createUserDto.email });
+        if (userDto !== null)
+            throw new BadRequestException('Email already in use');
+        const newUser = await this.databaseService.user.create({
+            data: {
+                ...createUserDto,
+                verified: true,
+            },
+        });
         return newUser;
     }
 
@@ -88,7 +106,15 @@ export class UsersService {
     // Check user's email and password
     async verifyCredentials(email: string, password: string) {
         const user = await this.findOne({ email: email });
+        // 1. User not found
         if (!user) throw new BadRequestException('Email not found');
+
+        // 2. OAuth user (no password) — block local login
+        if (!user.password) {
+            throw new BadRequestException(
+                `This account uses OAuth. Please log in with your provider. ${user.provider}`,
+            );
+        }
 
         const valid = await argon2.verify(user.password, password);
         if (!valid) throw new BadRequestException('Invalid password');

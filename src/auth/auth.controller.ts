@@ -1,13 +1,18 @@
 import {
     Body,
     Controller,
+    Get,
     Post,
     HttpCode,
     HttpStatus,
     ParseIntPipe,
+    UseGuards,
+    Req,
+    Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +21,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('login')
     signIn(@Body() loginDto: LoginDto) {
-        return this.authService.login(loginDto);
+        return this.authService.localLogin(loginDto);
     }
 
     @HttpCode(HttpStatus.OK)
@@ -26,5 +31,16 @@ export class AuthController {
         @Body('otp', ParseIntPipe) otp: number,
     ) {
         return this.authService.verifyUser(email, otp);
+    }
+
+    @UseGuards(GoogleAuthGuard)
+    @Get('google/login')
+    async googleLogin() {}
+
+    @UseGuards(GoogleAuthGuard)
+    @Get('google/callback')
+    async googleCallback(@Req() req) {
+        const response = await this.authService.OAuthLogin(req.user.id);
+        return response;
     }
 }

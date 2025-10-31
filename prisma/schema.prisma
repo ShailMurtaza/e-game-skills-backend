@@ -19,11 +19,15 @@ model User {
     id  Int @id @default(autoincrement())
     username    String
     email   String  @unique
-    password    String
-    role    Role
+    password    String? // NULL for OAuth users
+    role    Role    @default(pending)
     region_id   Int?
     region  Region?  @relation(fields: [region_id], references: [id])
     verified    Boolean @default(false)
+
+    // OAuth fields
+    provider  Provider?  // e.g., "google", "discord"
+    providerId String? // OAuth user ID from provider
 }
 
 model Region {
@@ -36,4 +40,10 @@ enum Role {
     player
     team
     admin
+    pending
+}
+
+enum Provider {
+    google
+    discord
 }
