@@ -8,27 +8,29 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from 'src/otp/otp.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { Provider } from 'generated/prisma/enums';
+import { Provider, Role } from 'generated/prisma/enums';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
+    private FRONTEND_URL: string;
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly otpService: OtpService,
-    ) {}
+        private readonly configService: ConfigService,
+    ) {
+        this.FRONTEND_URL =
+            this.configService.getOrThrow<string>('FRONTEND_URL');
+    }
 
-    async createJwtToken(user) {
+    createJwtToken(user) {
         const payload = {
             id: user.id,
             username: user.username,
-            role: user.role,
         };
         const accessToken = this.jwtService.sign(payload);
-        return {
-            accessToken,
-            userId: user.id,
-        };
+        return accessToken;
     }
 
     async localLogin(loginDto: LoginDto) {
@@ -40,7 +42,7 @@ export class AuthService {
             if (user.verified === false) {
                 throw new UnauthorizedException('Verify Email Address');
             }
-            return this.createJwtToken(user);
+            return { accessToken: this.createJwtToken(user), userId: user.id };
         }
     }
 
@@ -49,7 +51,21 @@ export class AuthService {
             id: user_id,
         });
         if (user) {
-            return this.createJwtToken(user);
+            var page = '';
+            if (user.role == Role.pending) {
+                var page = 'select_role';
+            } else if (user.role === Role.player) {
+                var page = 'player_dashboard';
+            } else if (user.role === Role.team) {
+                var page = 'team_dashboard';
+            } else if (user.role === Role.admin) {
+                var page = 'admin_panel';
+            }
+            return {
+                accessToken: this.createJwtToken(user),
+                userId: user.id,
+                redirect: `${this.FRONTEND_URL}/${page}`,
+            };
         }
     }
 

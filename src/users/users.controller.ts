@@ -52,6 +52,14 @@ export class UsersController {
         return this.usersService.generateOtp(email);
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.pending)
+    @Get('set-role/:role')
+    async setRole(@Req() req: any, @Param('role') role: Role) {
+        this.usersService.update(req.user.userId, { role: role });
+        return { message: 'Role has been set', role: role };
+    }
+
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
