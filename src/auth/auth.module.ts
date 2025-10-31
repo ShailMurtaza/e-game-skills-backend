@@ -8,6 +8,7 @@ import { OtpModule } from 'src/otp/otp.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { DiscordStrategy } from './strategies/discord.strategy';
 
 @Module({
     imports: [
@@ -25,6 +26,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
         ConfigModule,
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, GoogleStrategy],
+    providers: [AuthService, JwtStrategy, GoogleStrategy, DiscordStrategy],
 })
 export class AuthModule {}

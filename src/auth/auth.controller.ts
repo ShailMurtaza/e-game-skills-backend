@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { OAuthExceptionFilter } from 'src/exceptions/oauth.exceptions-filter';
+import { DiscordAuthGuard } from './guards/discord-auth/discord-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -43,6 +44,18 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     @Get('google/callback')
     async googleCallback(@Req() req) {
+        const response = await this.authService.OAuthLogin(req.user.id);
+        return response;
+    }
+
+    @UseGuards(DiscordAuthGuard)
+    @Get('discord/login')
+    async discordLogin() {}
+
+    @UseFilters(OAuthExceptionFilter)
+    @UseGuards(DiscordAuthGuard)
+    @Get('discord/callback')
+    async discordCallback(@Req() req) {
         const response = await this.authService.OAuthLogin(req.user.id);
         return response;
     }

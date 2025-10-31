@@ -7,11 +7,12 @@ export class OAuthExceptionFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
 
-        if (exception.message?.includes?.('invalid_grant')) {
-            return response.redirect('/login?error=oauth_invalid_grant');
-        }
-
-        if (exception.message?.includes?.('Bad Request')) {
+        if (
+            exception.code === 'invalid_grant' ||
+            exception.message?.includes?.('invalid_grant') ||
+            exception.response?.error === 'invalid_grant' ||
+            exception.message?.includes?.('Bad Request')
+        ) {
             return response.status(400).json({
                 message:
                     'OAuth provider rejected the request. Please try again.',

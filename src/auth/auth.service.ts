@@ -8,6 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from 'src/otp/otp.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { Provider } from 'generated/prisma/enums';
 
 @Injectable()
 export class AuthService {
@@ -66,12 +67,13 @@ export class AuthService {
         throw new BadRequestException('Not Matched');
     }
 
-    async validateGoogleUser(googleUser: CreateUserDto) {
+    async validateOAuthUser(createUserDto: CreateUserDto) {
         const user = await this.usersService.findOne({
-            email: googleUser.email,
+            email: createUserDto.email,
+            provider: createUserDto.provider,
         });
 
         if (user) return user;
-        return await this.usersService.createOAuthUser(googleUser);
+        return await this.usersService.createOAuthUser(createUserDto);
     }
 }

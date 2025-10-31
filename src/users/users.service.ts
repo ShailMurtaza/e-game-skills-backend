@@ -41,7 +41,7 @@ export class UsersService {
         return newUser;
     }
 
-    // Create new user
+    // Create new user using OAuth
     async createOAuthUser(createUserDto: CreateUserDto) {
         // User can't just create an admin account by passing role as admin
         const userDto = await this.findOne({ email: createUserDto.email });
@@ -80,6 +80,7 @@ export class UsersService {
                 email: filters?.email ? filters.email : undefined,
                 username: filters?.username ? filters.username : undefined,
                 password: filters?.password ? filters.password : undefined,
+                provider: filters?.provider ? filters.provider : undefined,
             },
         });
     }
@@ -112,7 +113,7 @@ export class UsersService {
         // 2. OAuth user (no password) — block local login
         if (!user.password) {
             throw new BadRequestException(
-                `This account uses OAuth. Please log in with your provider. ${user.provider}`,
+                `This account uses OAuth. Please log in with your provider: ${user.provider}`,
             );
         }
 
