@@ -17,7 +17,8 @@ import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { OAuthExceptionFilter } from 'src/exceptions/oauth.exceptions-filter';
 import { DiscordAuthGuard } from './guards/discord-auth/discord-auth.guard';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import type { Response } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -30,10 +31,25 @@ export class AuthController {
             this.configService.getOrThrow<string>('FRONTEND_URL');
     }
 
+    @Get('me')
+    @UseGuards(JwtAuthGuard) // your existing JWT guard
+    getProfile(@Req() req) {
+        const profile = this.authService.getProfile(req.user.userId);
+        return profile;
+    }
+
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    signIn(@Body() loginDto: LoginDto) {
-        return this.authService.localLogin(loginDto);
+    async signIn(
+        @Body() loginDto: LoginDto,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const accessToken = await this.authService.localLogin(loginDto);
+        if (!accessToken) throw new Error('Login Failed');
+
+        this.setAuthCookie(res, accessToken);
+
+        return { message: 'Logged in' };
     }
 
     @HttpCode(HttpStatus.OK)
@@ -53,11 +69,7 @@ export class AuthController {
     @UseGuards(GoogleAuthGuard)
     @Get('google/callback')
     async googleCallback(@Req() req, @Res() res) {
-        const result = await this.authService.OAuthLogin(req.user.id);
-        if (!result)
-            return res.redirect(`${this.FRONTEND_URL}/auth?action=signin`);
-        this.setAuthCookie(res, result.accessToken);
-        res.redirect(result.redirect);
+        return this.handleOAuthCallback(req, res);
     }
 
     @UseGuards(DiscordAuthGuard)
@@ -67,7 +79,11 @@ export class AuthController {
     @UseFilters(OAuthExceptionFilter)
     @UseGuards(DiscordAuthGuard)
     @Get('discord/callback')
-    async discordCallback(@Req() req, @Res() res) {
+    discordCallback(@Req() req, @Res() res) {
+        return this.handleOAuthCallback(req, res);
+    }
+
+    private async handleOAuthCallback(@Req() req, @Res() res) {
         const result = await this.authService.OAuthLogin(req.user.id);
         if (!result)
             return res.redirect(`${this.FRONTEND_URL}/auth?action=signin`);
@@ -75,11 +91,19 @@ export class AuthController {
         res.redirect(result.redirect);
     }
 
+    @HttpCode(200)
+    @UseGuards(JwtAuthGuard) // your existing JWT guard
+    @Post('logout')
+    logout(@Res({ passthrough: true }) res: Response) {
+        res.clearCookie('accessToken', { path: '/' });
+        return { message: 'Logged out' };
+    }
+
     private setAuthCookie(res: Response, token: string) {
         const isProduction =
             this.configService.getOrThrow('NODE_ENV') === 'production';
 
-        res.cookie('access_token', token, {
+        res.cookie('accessToken', token, {
             httpOnly: true,
             secure: isProduction, // HTTPS only in prod
             sameSite: 'lax', // or 'strict'

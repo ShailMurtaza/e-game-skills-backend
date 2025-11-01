@@ -27,7 +27,6 @@ export class AuthService {
     createJwtToken(user) {
         const payload = {
             id: user.id,
-            username: user.username,
         };
         const accessToken = this.jwtService.sign(payload);
         return accessToken;
@@ -42,10 +41,11 @@ export class AuthService {
             if (user.verified === false) {
                 throw new UnauthorizedException('Verify Email Address');
             }
-            return { accessToken: this.createJwtToken(user), userId: user.id };
+            return this.createJwtToken(user);
         }
     }
 
+    // Need redirect with accessToken because unlike localLogin, OAuth uses full page redirect
     async OAuthLogin(user_id: number) {
         const user = await this.usersService.findOne({
             id: user_id,
@@ -63,7 +63,6 @@ export class AuthService {
             }
             return {
                 accessToken: this.createJwtToken(user),
-                userId: user.id,
                 redirect: `${this.FRONTEND_URL}/${page}`,
             };
         }
@@ -91,5 +90,16 @@ export class AuthService {
 
         if (user) return user;
         return await this.usersService.createOAuthUser(createUserDto);
+    }
+
+    async getProfile(userId: number) {
+        const user = await this.usersService.findOne({ id: userId });
+        if (user === null) {
+            throw new BadRequestException('User Not Found');
+        }
+        return {
+            userId: user.id,
+            role: user.role,
+        };
     }
 }
