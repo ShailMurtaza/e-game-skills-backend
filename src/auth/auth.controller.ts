@@ -31,6 +31,7 @@ export class AuthController {
             this.configService.getOrThrow<string>('FRONTEND_URL');
     }
 
+    @HttpCode(200)
     @Get('me')
     @UseGuards(JwtAuthGuard) // your existing JWT guard
     getProfile(@Req() req) {
