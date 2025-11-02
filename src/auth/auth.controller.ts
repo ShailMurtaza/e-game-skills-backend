@@ -93,8 +93,8 @@ export class AuthController {
     }
 
     @HttpCode(200)
-    @UseGuards(JwtAuthGuard) // your existing JWT guard
-    @Post('logout')
+    @UseGuards(JwtAuthGuard)
+    @Get('logout')
     logout(@Res({ passthrough: true }) res: Response) {
         res.clearCookie('accessToken', { path: '/' });
         return { message: 'Logged out' };
