@@ -39,6 +39,14 @@ export class CreateUserDto {
     @IsOptional()
     @IsString()
     providerId?: string;
+
+    @IsOptional()
+    @IsString()
+    notes?: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
 }
 
 export class UpdateUserDto {
@@ -60,7 +68,7 @@ export class UpdateUserDto {
 
     @IsOptional()
     @IsInt()
-    region_id?: number; // ← now safe
+    region_id?: number;
 
     @IsOptional()
     @IsBoolean()
@@ -73,6 +81,14 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     providerId?: string;
+
+    @IsOptional()
+    @IsString()
+    notes?: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
 }
 
 export class ResetPasswordDto {

@@ -17,13 +17,17 @@ datasource db {
 
 model User {
     id  Int @id @default(autoincrement())
-    username    String
+    username String @db.VarChar(50)
     email   String  @unique
     password    String? // NULL for OAuth users
     role    Role    @default(pending)
     region_id   Int?
     region  Region?  @relation(fields: [region_id], references: [id])
     verified    Boolean @default(false)
+    avatar Bytes? @db.Binary(16) @unique
+    notes   String?
+    description String? @db.Text
+
 
     // OAuth fields
     provider  Provider?  // e.g., "google", "discord"

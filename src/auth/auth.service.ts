@@ -99,7 +99,12 @@ export class AuthService {
         }
         return {
             userId: user.id,
+            username: user.username,
+            email: user.email,
             role: user.role,
+            region_id: user.region_id,
+            avatar: user.avatar,
+            description: user.description,
         };
     }
 }
