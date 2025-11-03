@@ -10,7 +10,12 @@ import {
     Query,
     UseGuards,
     Req,
+    Res,
+    UseInterceptors,
+    UploadedFile,
+    BadRequestException,
 } from '@nestjs/common';
+import multer from 'multer';
 import { UsersService } from './users.service';
 import {
     CreateUserDto,
@@ -21,6 +26,10 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'generated/prisma/enums';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Observable, of } from 'rxjs';
+import { join } from 'path';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
 @Controller('users')
 export class UsersController {
@@ -89,5 +98,53 @@ export class UsersController {
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.findOne({ id: id });
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('update_profile')
+    @UseInterceptors(
+        FileInterceptor('avatar', {
+            storage: multer.memoryStorage(),
+            fileFilter: (req, file, cb) => {
+                const allowedTypes = [
+                    'image/jpeg',
+                    'image/jpg',
+                    'image/png',
+                    'image/webp',
+                    'image/gif',
+                ];
+                if (allowedTypes.includes(file.mimetype)) {
+                    cb(null, true);
+                } else {
+                    cb(
+                        new Error(
+                            'Invalid file type. Only JPEG, PNG, WebP allowed.',
+                        ),
+                        false,
+                    );
+                }
+            },
+            limits: { fileSize: 15 * 1024 * 1024 }, // 5MB
+        }),
+    )
+    async updateProfile(
+        @UploadedFile() file: Express.Multer.File | undefined,
+        @Body() dto: UpdateUserProfileDto,
+        @Req() req: any,
+    ) {
+        const userId = req.user?.userId;
+        if (!userId) throw new BadRequestException('User not authenticated');
+
+        const result = await this.usersService.updateProfile(userId, dto, file);
+        return result;
+    }
+
+    @Get('avatar/:name')
+    avatar(@Param('name') name: string, @Res() res): Observable<Object> {
+        return of(
+            res.sendFile(
+                join(process.cwd(), 'uploads/avatars/' + name + '.webp'),
+            ),
+        );
     }
 }

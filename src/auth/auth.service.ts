@@ -103,7 +103,9 @@ export class AuthService {
             email: user.email,
             role: user.role,
             region_id: user.region_id,
-            avatar: user.avatar,
+            avatar: user.avatar
+                ? Buffer.from(user.avatar).toString('hex')
+                : null,
             description: user.description,
         };
     }

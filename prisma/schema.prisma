@@ -51,3 +51,25 @@ enum Provider {
     google
     discord
 }
+
+model Game {
+    id  Int @id @default(autoincrement())
+    name String @db.VarChar(50)
+    attributes  GameAttributes[]
+
+}
+
+model GameAttributes {
+    id  Int @id @default(autoincrement())
+    name    String  @db.VarChar(50)
+    game_id Int
+    datatype    GameAttributeType
+    game    Game    @relation(fields: [game_id], references: [id])
+}
+
+enum GameAttributeType {
+    text
+    number
+    date
+}
+

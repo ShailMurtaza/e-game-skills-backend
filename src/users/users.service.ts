@@ -1,4 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+import sharp from 'sharp';
+import path from 'path';
+import { promises as fs } from 'fs';
 import { DatabaseService } from 'src/database/database.service';
 import { OtpService } from 'src/otp/otp.service';
 import {
@@ -9,6 +13,13 @@ import {
 import { EmailService } from 'src/email/email.service';
 import { SendEmailDto } from 'src/email/dto/email.dto';
 import * as argon2 from 'argon2';
+
+export interface UpdateProfileResult {
+    message: string;
+    filename?: string;
+    uuid?: string;
+    url?: string;
+}
 
 @Injectable()
 export class UsersService {
@@ -146,5 +157,86 @@ export class UsersService {
         const hashedPassword = await argon2.hash(resetPasswordDto.password);
         this.update(user.id, { password: hashedPassword, verified: true });
         return { message: 'Password Reset Successfull' };
+    }
+
+    async updateProfile(
+        userId: number,
+        dto: UpdateUserDto,
+        file?: Express.Multer.File,
+    ): Promise<UpdateProfileResult> {
+        const data: any = { ...dto };
+
+        let filename: string | undefined;
+        let uuidHex: string | undefined;
+
+        // --- Get current user to check for old avatar ---
+        const user = await this.databaseService.user.findUnique({
+            where: { id: userId },
+            select: { avatar: true },
+        });
+        const oldAvatarUuidBuffer: Buffer | null = user?.avatar
+            ? Buffer.from(user.avatar) // Convert Uint8Array to Buffer. Because Database returns Uint8Array. uint8Array and Buffer is same but typescript treat them separately
+            : null;
+
+        if (file) {
+            // ---- Generate 16‑byte binary UUID ----
+            const uuidBuffer = Buffer.alloc(16);
+            uuidv4(undefined, uuidBuffer);
+            uuidHex = uuidBuffer.toString('hex');
+
+            // ---- Convert to WebP (80% quality) ----
+            const webpBuffer = await sharp(file.buffer)
+                .webp({ quality: 80 })
+                .toBuffer();
+
+            // ---- Persist file on disk ----
+            filename = `${uuidHex}.webp`;
+            const filepath = path.join(
+                process.cwd(),
+                'uploads/avatars',
+                filename,
+            );
+            await fs.mkdir(path.dirname(filepath), { recursive: true });
+            await fs.writeFile(filepath, webpBuffer);
+
+            // ---- Store binary UUID in DB (unique) ----
+            data.avatar = uuidBuffer;
+
+            // --- Delete old avatar image ---
+            if (oldAvatarUuidBuffer) {
+                const oldFilename = `${oldAvatarUuidBuffer.toString('hex')}.webp`;
+                const oldFilepath = path.join(
+                    process.cwd(),
+                    'uploads/avatars',
+                    oldFilename,
+                );
+
+                try {
+                    await fs.unlink(oldFilepath);
+                } catch (err: any) {
+                    if (err.code !== 'ENOENT') {
+                        console.warn(
+                            `Failed to delete old avatar: ${oldFilename}`,
+                            err,
+                        );
+                    }
+                }
+            }
+        }
+
+        // ---- Update user record (text fields + avatar) ----
+        await this.databaseService.user.update({
+            where: { id: userId },
+            data,
+        });
+
+        return {
+            message: 'Profile updated successfully',
+            ...(filename && {
+                filename,
+                uuid: uuidHex,
+                url: `/uploads/${filename}`,
+            }),
+        };
     }
 }
