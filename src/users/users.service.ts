@@ -37,7 +37,6 @@ export class UsersService {
                 verified: false, // Always false while creating new user
             },
         });
-        this.generateOtp(newUser.email);
         return newUser;
     }
 
