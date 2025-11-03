@@ -28,6 +28,8 @@ model User {
     notes   String?
     description String? @db.Text
 
+    user_games  UserGame[]
+
 
     // OAuth fields
     provider  Provider?  // e.g., "google", "discord"
@@ -55,16 +57,17 @@ enum Provider {
 model Game {
     id  Int @id @default(autoincrement())
     name String @db.VarChar(50)
-    attributes  GameAttributes[]
-
+    attributes  GameAttribute[]
+    user_games   UserGame[]
 }
 
-model GameAttributes {
+model GameAttribute {
     id  Int @id @default(autoincrement())
     name    String  @db.VarChar(50)
     game_id Int
     datatype    GameAttributeType
-    game    Game    @relation(fields: [game_id], references: [id])
+    game    Game    @relation(fields: [game_id], references: [id], onDelete: Cascade)
+    value   UserGameAttributeValue[]
 }
 
 enum GameAttributeType {
@@ -73,3 +76,35 @@ enum GameAttributeType {
     date
 }
 
+model UserGame {
+    id  Int @id @default(autoincrement())
+    user_id Int
+    game_id Int
+    user    User    @relation(fields: [user_id], references: [id])
+    game    Game    @relation(fields: [game_id], references: [id], onDelete: Cascade)
+    attribute_values    UserGameAttributeValue[]
+    custom_attributes  UserGameCustomAttribute[]
+
+    @@unique([user_id, game_id])
+}
+
+model UserGameAttributeValue {
+    id  Int @id @default(autoincrement())
+    textValue   String? @db.VarChar(50)
+    numberValue Float?
+    dateValue   DateTime?
+    user_game_id    Int
+    game_attribute_id   Int
+    
+    user_game   UserGame    @relation(fields: [user_game_id], references: [id], onDelete: Cascade)
+    game_attribute   GameAttribute    @relation(fields: [game_attribute_id], references: [id], onDelete: Cascade)
+    @@unique([user_game_id, game_attribute_id])
+}
+
+model UserGameCustomAttribute {
+    id  Int @id @default(autoincrement())
+    user_game_id Int
+    name    String  @db.VarChar(50)
+    value   String  @db.VarChar(50)
+    user_game   UserGame    @relation(fields: [user_game_id], references: [id], onDelete: Cascade)
+}
