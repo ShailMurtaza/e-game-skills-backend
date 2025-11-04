@@ -8,6 +8,7 @@ import {
     Delete,
     Req,
     UseGuards,
+    ParseIntPipe,
 } from '@nestjs/common';
 import { UsersGamesService } from './users_games.service';
 import type {
@@ -34,9 +35,15 @@ export class UsersGamesController {
         return this.usersGamesService.findAll(filter);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Post('allData')
+    saveLinks(@Body() allData: any, @Req() req) {
+        return this.usersGamesService.SaveAllData(req.user.userId, allData);
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
-        return this.usersGamesService.findOne(+id);
+        return this.usersGamesService.findOne({ id: +id });
     }
 
     @UseGuards(JwtAuthGuard)
@@ -49,8 +56,15 @@ export class UsersGamesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':id')
-    remove(@Param('id') id: string, @Req() req) {
-        return this.usersGamesService.remove(+id, req.user.userId);
+    @Delete(':game_id')
+    async remove(@Param('game_id', ParseIntPipe) game_id: number, @Req() req) {
+        if (
+            await this.usersGamesService.removeUsingGameId(
+                game_id,
+                req.user.userId,
+            )
+        )
+            return { message: 'Deleted Game Successfuly' };
+        else throw new Error('Failed');
     }
 }

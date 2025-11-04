@@ -65,15 +65,8 @@ model GameAttribute {
     id  Int @id @default(autoincrement())
     name    String  @db.VarChar(50)
     game_id Int
-    datatype    GameAttributeType
     game    Game    @relation(fields: [game_id], references: [id], onDelete: Cascade)
     value   UserGameAttributeValue[]
-}
-
-enum GameAttributeType {
-    text
-    number
-    date
 }
 
 model UserGame {
@@ -84,15 +77,15 @@ model UserGame {
     game    Game    @relation(fields: [game_id], references: [id], onDelete: Cascade)
     attribute_values    UserGameAttributeValue[]
     custom_attributes  UserGameCustomAttribute[]
+    Links   UserGameLinks[]
+    WinsLoss  WinsLoss[]
 
     @@unique([user_id, game_id])
 }
 
 model UserGameAttributeValue {
     id  Int @id @default(autoincrement())
-    textValue   String? @db.VarChar(50)
-    numberValue Float?
-    dateValue   DateTime?
+    value   String? @db.VarChar(50)
     user_game_id    Int
     game_attribute_id   Int
     
@@ -107,4 +100,26 @@ model UserGameCustomAttribute {
     name    String  @db.VarChar(50)
     value   String  @db.VarChar(50)
     user_game   UserGame    @relation(fields: [user_game_id], references: [id], onDelete: Cascade)
+}
+
+model UserGameLinks {
+    id  Int @id @default(autoincrement())
+    user_game_id Int
+    name    String  @db.VarChar(50)
+    value   String  @db.VarChar(100)
+    user_game   UserGame    @relation(fields: [user_game_id], references: [id], onDelete: Cascade)
+}
+
+model WinsLoss {
+    id  Int @id @default(autoincrement())
+    user_game_id Int
+    date    DateTime    @db.Date
+    value   Int
+    type    WinLoss_type
+    user_game   UserGame    @relation(fields: [user_game_id], references: [id], onDelete: Cascade)
+}
+
+enum WinLoss_type {
+    Win
+    Loss
 }

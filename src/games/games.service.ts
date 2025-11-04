@@ -15,8 +15,8 @@ export class GamesService {
     findAll() {
         return this.databaseService.game.findMany({
             include: {
-                attributes: true
-            }
+                attributes: true,
+            },
         });
     }
 
