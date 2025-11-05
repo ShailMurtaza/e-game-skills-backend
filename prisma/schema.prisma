@@ -21,8 +21,8 @@ model User {
     email   String  @unique
     password    String? // NULL for OAuth users
     role    Role    @default(pending)
-    region_id   Int?
-    region  Region?  @relation(fields: [region_id], references: [id])
+    region   String?
+    country   String?
     verified    Boolean @default(false)
     avatar Bytes? @db.Binary(16) @unique
     notes   String?
@@ -34,12 +34,6 @@ model User {
     // OAuth fields
     provider  Provider?  // e.g., "google", "discord"
     providerId String? // OAuth user ID from provider
-}
-
-model Region {
-  id     Int     @id @default(autoincrement())
-  name   String
-  users  User[]   // one region → many users
 }
 
 enum Role {

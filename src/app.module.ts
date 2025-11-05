@@ -8,7 +8,6 @@ import { OtpModule } from './otp/otp.module';
 import { EmailModule } from './email/email.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { RegionModule } from './region/region.module';
 import { GamesModule } from './games/games.module';
 import { UsersGamesModule } from './users_games/users_games.module';
 
@@ -20,7 +19,6 @@ import { UsersGamesModule } from './users_games/users_games.module';
         OtpModule,
         EmailModule,
         AuthModule,
-        RegionModule,
         GamesModule,
         UsersGamesModule,
     ],

@@ -27,10 +27,15 @@ export class UsersGamesService {
                 game_id: filters?.game_id,
             },
             include: {
-                attribute_values: true,
+                attribute_values: {
+                    include: {
+                        game_attribute: true,
+                    },
+                },
                 custom_attributes: true,
                 Links: true,
                 WinsLoss: true,
+                game: true,
             },
         });
     }

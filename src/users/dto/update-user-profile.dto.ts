@@ -1,5 +1,5 @@
 // Only for updating. So it shouldn't accept any other fields
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 export class UpdateUserProfileDto {
     @IsOptional()
     @IsString()
@@ -10,6 +10,10 @@ export class UpdateUserProfileDto {
     description?: string;
 
     @IsOptional()
-    @IsNumber()
-    region_id?: number;
+    @IsString()
+    country?: string;
+
+    @IsOptional()
+    @IsString()
+    region?: string;
 }

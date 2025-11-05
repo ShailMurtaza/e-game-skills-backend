@@ -37,8 +37,13 @@ export class UsersGamesController {
 
     @UseGuards(JwtAuthGuard)
     @Post('allData')
-    saveLinks(@Body() allData: any, @Req() req) {
+    saveAllData(@Body() allData: any, @Req() req) {
         return this.usersGamesService.SaveAllData(req.user.userId, allData);
+    }
+
+    @Get('allData/:user_id')
+    getUserGames(@Param('user_id', ParseIntPipe) userId: number) {
+        return this.usersGamesService.findAll({ user_id: userId });
     }
 
     @Get(':id')

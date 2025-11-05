@@ -75,9 +75,6 @@ export class UsersService {
                     : undefined,
                 email: filters?.email ? { contains: filters.email } : undefined,
                 role: filters?.role,
-                region_id: filters?.region_id
-                    ? Number(filters.region_id)
-                    : undefined,
             },
         });
     }
@@ -167,6 +164,8 @@ export class UsersService {
             select: {
                 username: true,
                 region: true,
+                country: true,
+                role: true,
                 avatar: true,
                 description: true,
                 email: true,
@@ -178,7 +177,8 @@ export class UsersService {
         return {
             username: user.username,
             email: user.email,
-            region: user.region?.name,
+            region: user.region,
+            country: user.country,
             avatar: user.avatar
                 ? Buffer.from(user.avatar).toString('hex')
                 : null,

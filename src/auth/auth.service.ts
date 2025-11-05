@@ -102,7 +102,8 @@ export class AuthService {
             username: user.username,
             email: user.email,
             role: user.role,
-            region_id: user.region_id,
+            country: user.country,
+            region: user.region,
             avatar: user.avatar
                 ? Buffer.from(user.avatar).toString('hex')
                 : null,
