@@ -14,7 +14,9 @@ import {
     UseInterceptors,
     UploadedFile,
     BadRequestException,
+    NotFoundException,
 } from '@nestjs/common';
+import { promises as fs } from 'fs';
 import multer from 'multer';
 import { UsersService } from './users.service';
 import {
@@ -27,7 +29,6 @@ import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'generated/prisma/enums';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Observable, of } from 'rxjs';
 import { join } from 'path';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
@@ -139,11 +140,17 @@ export class UsersController {
     }
 
     @Get('avatar/:name')
-    avatar(@Param('name') name: string, @Res() res): Observable<Object> {
-        return of(
-            res.sendFile(
-                join(process.cwd(), 'uploads/avatars/' + name + '.webp'),
-            ),
-        );
+    async avatar(@Param('name') name: string, @Res() res) {
+        if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+            throw new NotFoundException('Invalid filename');
+        }
+        const filePath = join(process.cwd(), 'uploads/avatars', `${name}.webp`);
+
+        try {
+            await fs.access(filePath);
+        } catch {
+            throw new NotFoundException('Avatar not found');
+        }
+        return res.sendFile(filePath);
     }
 }
