@@ -46,6 +46,11 @@ export class UsersController {
         return this.usersService.resetPassword(resetPasswordDto);
     }
 
+    @Get('profile/:userId')
+    async getProfile(@Param('userId', ParseIntPipe) userId: number) {
+        return await this.usersService.getPublicProfileData(userId);
+    }
+
     @Get()
     findAll(@Query() query: Record<string, any>) {
         return this.usersService.findAll(query);
@@ -65,7 +70,7 @@ export class UsersController {
     @Roles(Role.pending)
     @Get('set-role/:role')
     async setRole(@Req() req: any, @Param('role') role: Role) {
-        this.usersService.update(req.user.userId, { role: role });
+        await this.usersService.update(req.user.userId, { role: role });
         return { message: 'Role has been set', role: role };
     }
 
@@ -80,12 +85,6 @@ export class UsersController {
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.remove(id);
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('profile')
-    async getProfile(@Req() req: any) {
-        return 'User Id: ' + req.user.userId;
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)

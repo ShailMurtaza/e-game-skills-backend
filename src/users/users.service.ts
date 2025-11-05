@@ -159,6 +159,33 @@ export class UsersService {
         return { message: 'Password Reset Successfull' };
     }
 
+    async getPublicProfileData(userId: number) {
+        const user = await this.databaseService.user.findUnique({
+            where: {
+                id: userId,
+            },
+            select: {
+                username: true,
+                region: true,
+                avatar: true,
+                description: true,
+                email: true,
+            },
+        });
+        if (user === null) {
+            throw new BadRequestException('User Not Found');
+        }
+        return {
+            username: user.username,
+            email: user.email,
+            region: user.region?.name,
+            avatar: user.avatar
+                ? Buffer.from(user.avatar).toString('hex')
+                : null,
+            description: user.description,
+        };
+    }
+
     async updateProfile(
         userId: number,
         dto: UpdateUserDto,
