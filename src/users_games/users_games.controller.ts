@@ -9,6 +9,7 @@ import {
     Req,
     UseGuards,
     ParseIntPipe,
+    Put,
 } from '@nestjs/common';
 import { UsersGamesService } from './users_games.service';
 import type {
@@ -16,6 +17,7 @@ import type {
     UserGameUpdateInput,
 } from 'generated/prisma/models';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import SearchDataDto from './dto/search.dto';
 
 @Controller('users-games')
 export class UsersGamesController {
@@ -24,6 +26,11 @@ export class UsersGamesController {
     @Post()
     create(@Body() userGameCreateInput: UserGameCreateInput) {
         return this.usersGamesService.create(userGameCreateInput);
+    }
+
+    @Post('search')
+    async search(@Body() data: SearchDataDto) {
+        return await this.usersGamesService.search(data);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -36,7 +43,7 @@ export class UsersGamesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post('allData')
+    @Put('saveAllData')
     saveAllData(@Body() allData: any, @Req() req) {
         return this.usersGamesService.SaveAllData(req.user.userId, allData);
     }
@@ -54,10 +61,10 @@ export class UsersGamesController {
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
     update(
-        @Param('id') id: string,
+        @Param('id', ParseIntPipe) id: number,
         @Body() userGameUpdateInput: UserGameUpdateInput,
     ) {
-        return this.usersGamesService.update(+id, userGameUpdateInput);
+        return this.usersGamesService.update(id, userGameUpdateInput);
     }
 
     @UseGuards(JwtAuthGuard)

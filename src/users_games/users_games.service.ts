@@ -6,9 +6,11 @@ import {
 import {
     UserGameCreateInput,
     UserGameUpdateInput,
+    UserGameWhereInput,
     WinsLossCreateWithoutUser_gameInput,
 } from 'generated/prisma/models';
 import { DatabaseService } from 'src/database/database.service';
+import SearchDataDto from './dto/search.dto';
 
 @Injectable()
 export class UsersGamesService {
@@ -168,5 +170,125 @@ export class UsersGamesService {
         });
 
         return { message: 'Data Saved' };
+    }
+
+    async search(data: SearchDataDto) {
+        // SELECT u.username, u.avatar, ug.game_id, uga.game_attribute_id, uga.value FROM UserGame as ug INNER JOIN UserGameAttributeValue as uga ON ug.id=uga.user_game_id Inner join User as u ON ug.user_id=u.id WHERE u.username LIKE "%%" AND ((uga.game_attribute_id=1 AND uga.value Like "%herald%") OR (uga.game_attribute_id=3 AND uga.value LIKE "%carry%"));
+        var results: {
+            id: number;
+            username: string;
+            avatar: Uint8Array<ArrayBuffer> | string | null;
+            user_games: {
+                attribute_values: {
+                    game_attribute_id: number;
+                    value: string;
+                }[];
+            }[];
+        }[] = [];
+        if (Object.keys(data.attributes).length) {
+            var gameAttributesFilter: UserGameWhereInput = {
+                attribute_values: {
+                    some: {
+                        OR: Object.keys(data.attributes).map((attr_id) => {
+                            const id = Number(attr_id);
+                            return {
+                                game_attribute_id: id,
+                                value: { contains: data.attributes[id] },
+                            };
+                        }),
+                    },
+                },
+            };
+            results = await this.databaseService.user.findMany({
+                where: {
+                    username: {
+                        contains: data.name,
+                    },
+                    user_games: {
+                        some: gameAttributesFilter,
+                    },
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    avatar: true,
+                    user_games: {
+                        where: gameAttributesFilter,
+                        select: {
+                            attribute_values: {
+                                select: {
+                                    game_attribute_id: true,
+                                    value: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+        } else {
+            results = await this.databaseService.user.findMany({
+                where: {
+                    username: {
+                        contains: data.name,
+                    },
+                    user_games: {
+                        some: {
+                            game_id: data.game_id,
+                        },
+                    },
+                },
+                select: {
+                    id: true,
+                    username: true,
+                    avatar: true,
+                    user_games: {
+                        where: {
+                            game_id: data.game_id,
+                        },
+                        select: {
+                            attribute_values: {
+                                select: {
+                                    game_attribute_id: true,
+                                    value: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+        }
+
+        var user_games: any[] = [];
+
+        const promises = results.map(async (result) => {
+            const avatar: string | null = result.avatar
+                ? Buffer.from(result.avatar).toString('hex')
+                : null;
+            result.avatar = avatar;
+            const games = await this.databaseService.user.findUnique({
+                where: {
+                    id: result.id, // Find using user id
+                },
+                select: {
+                    id: true,
+                    user_games: {
+                        select: {
+                            game: {
+                                select: {
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+            user_games.push(games);
+        });
+        await Promise.all(promises);
+        return {
+            message: 'Search Completed',
+            results: results,
+            games: user_games,
+        };
     }
 }

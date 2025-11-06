@@ -124,7 +124,7 @@ export class UsersController {
                     );
                 }
             },
-            limits: { fileSize: 15 * 1024 * 1024 }, // 5MB
+            limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
         }),
     )
     async updateProfile(
