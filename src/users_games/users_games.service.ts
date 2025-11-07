@@ -181,7 +181,7 @@ export class UsersGamesService {
             user_games: {
                 attribute_values: {
                     game_attribute_id: number;
-                    value: string;
+                    value: string | null;
                 }[];
             }[];
         }[] = [];
