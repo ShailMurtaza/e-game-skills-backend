@@ -98,7 +98,7 @@ export class AuthService {
             throw new BadRequestException('User Not Found');
         }
         return {
-            userId: user.id,
+            id: user.id,
             username: user.username,
             email: user.email,
             role: user.role,
