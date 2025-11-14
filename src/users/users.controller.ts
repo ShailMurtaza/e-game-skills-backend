@@ -71,6 +71,8 @@ export class UsersController {
     @Roles(Role.pending)
     @Get('set-role/:role')
     async setRole(@Req() req: any, @Param('role') role: Role) {
+        // User can't just send admin as a role
+        if (role === Role.admin) throw new BadRequestException('Invalid Role');
         await this.usersService.update(req.user.userId, { role: role });
         return { message: 'Role has been set', role: role };
     }
@@ -86,13 +88,6 @@ export class UsersController {
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.remove(id);
-    }
-
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.admin)
-    @Get('admin')
-    async getAdmin(@Req() req: any) {
-        return 'Welcome Admin';
     }
 
     @Get(':id')

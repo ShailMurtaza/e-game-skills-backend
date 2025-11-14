@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { GamesModule } from './games/games.module';
 import { UsersGamesModule } from './users_games/users_games.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { UsersGamesModule } from './users_games/users_games.module';
         AuthModule,
         GamesModule,
         UsersGamesModule,
+        AdminModule,
     ],
     controllers: [AppController],
     providers: [AppService, DatabaseService],

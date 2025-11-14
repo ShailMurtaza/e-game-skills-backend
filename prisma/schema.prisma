@@ -27,6 +27,7 @@ model User {
     avatar Bytes? @db.Binary(16) @unique
     notes   String?
     description String? @db.Text
+    banned  Boolean @default(false)
 
     user_games  UserGame[]
 

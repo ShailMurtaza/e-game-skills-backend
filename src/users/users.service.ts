@@ -13,6 +13,7 @@ import {
 import { EmailService } from 'src/email/email.service';
 import { SendEmailDto } from 'src/email/dto/email.dto';
 import * as argon2 from 'argon2';
+import { Role } from 'generated/prisma/enums';
 
 export interface UpdateProfileResult {
     message: string;
@@ -35,7 +36,7 @@ export class UsersService {
             throw new BadRequestException('Password Not Found');
         }
         // User can't just create an admin account by passing role as admin
-        if (signup && createUserDto.role === 'admin')
+        if (signup && createUserDto.role === Role.admin)
             throw new BadRequestException('Invalid Role');
         const userDto = await this.findOne({ email: createUserDto.email });
         if (userDto !== null)
