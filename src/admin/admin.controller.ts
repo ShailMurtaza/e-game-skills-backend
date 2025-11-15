@@ -1,4 +1,11 @@
-import { Controller, UseGuards, Get } from '@nestjs/common';
+import {
+    Controller,
+    UseGuards,
+    Get,
+    Query,
+    ParseIntPipe,
+    DefaultValuePipe,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'generated/prisma/enums';
@@ -17,6 +24,12 @@ export class AdminController {
 
     @Get('user_count')
     async getUserCount() {
-        return this.adminService.getUserCount();
+        return await this.adminService.getUserCount();
+    }
+
+    @Get('users')
+    async getUsers(@Query('page', new DefaultValuePipe(1)) page: number) {
+        page = Math.max(1, page);
+        return await this.adminService.getUsers(page);
     }
 }
