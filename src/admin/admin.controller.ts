@@ -41,7 +41,6 @@ export class AdminController {
     @Post('user/update')
     async UpdateUser(@Body() data: UpdateUserDto) {
         const result = await this.adminService.updateUser(data);
-        console.log(data);
         if (result) return { message: 'User Updated' };
     }
 }
