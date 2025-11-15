@@ -3,14 +3,16 @@ import {
     UseGuards,
     Get,
     Query,
-    ParseIntPipe,
     DefaultValuePipe,
+    Post,
+    Body,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { UpdateUserDto } from 'src/users/dto/create-user.dto';
 
 @Roles(Role.admin)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,9 +29,12 @@ export class AdminController {
         return await this.adminService.getUserCount();
     }
 
-    @Get('users')
-    async getUsers(@Query('page', new DefaultValuePipe(1)) page: number) {
+    @Post('users')
+    async getUsers(
+        @Body() filter: Record<string, any>,
+        @Query('page', new DefaultValuePipe(1)) page: number,
+    ) {
         page = Math.max(1, page);
-        return await this.adminService.getUsers(page);
+        return await this.adminService.getUsers(page, filter);
     }
 }

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { UpdateUserDto } from 'src/users/dto/create-user.dto';
 
 @Injectable()
 export class AdminService {
@@ -31,12 +32,23 @@ export class AdminService {
         };
     }
 
-    async getUsers(page: number) {
-        const total_users = await this.databaseService.user.count();
+    async getUsers(page: number, filter: Record<string, any>) {
+        const userWhereFilter = {
+            ...filter,
+            email: filter?.email ? { contains: filter.email } : undefined,
+            username: filter?.username
+                ? { contains: filter.username }
+                : undefined,
+        };
+        const total_users = await this.databaseService.user.count({
+            where: userWhereFilter,
+        });
+        if (!total_users) throw new NotFoundException('No User Found');
         const max_pages = Math.ceil(total_users / this.users_per_page);
         if (page > max_pages)
             throw new NotFoundException('Invalid Page number');
         const users = await this.databaseService.user.findMany({
+            where: userWhereFilter,
             select: {
                 id: true,
                 username: true,
