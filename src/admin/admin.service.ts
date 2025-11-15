@@ -68,4 +68,14 @@ export class AdminService {
             max_pages: max_pages,
         };
     }
+
+    async updateUser(data: UpdateUserDto) {
+        await this.databaseService.user.update({
+            data: data,
+            where: {
+                id: data.id,
+            },
+        });
+        return true;
+    }
 }

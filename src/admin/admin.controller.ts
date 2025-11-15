@@ -37,4 +37,11 @@ export class AdminController {
         page = Math.max(1, page);
         return await this.adminService.getUsers(page, filter);
     }
+
+    @Post('user/update')
+    async UpdateUser(@Body() data: UpdateUserDto) {
+        const result = await this.adminService.updateUser(data);
+        console.log(data);
+        if (result) return { message: 'User Updated' };
+    }
 }

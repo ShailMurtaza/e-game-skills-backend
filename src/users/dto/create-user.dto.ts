@@ -33,6 +33,10 @@ export class CreateUserDto {
     verified?: boolean;
 
     @IsOptional()
+    @IsBoolean()
+    banned?: boolean;
+
+    @IsOptional()
     @IsEnum(Provider)
     provider?: Provider;
 
@@ -50,6 +54,10 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
+    @IsOptional()
+    @IsNumber()
+    id?: number;
+
     @IsOptional()
     @IsString()
     username?: string;
@@ -73,6 +81,10 @@ export class UpdateUserDto {
     @IsOptional()
     @IsBoolean()
     verified?: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    banned?: boolean;
 
     @IsOptional()
     @IsEnum(Provider)
