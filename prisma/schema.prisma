@@ -118,3 +118,10 @@ enum WinLoss_type {
     Win
     Loss
 }
+
+model Announcements {
+    id  Int @id @default(autoincrement())
+    title   String
+    announcement    String  @db.Text
+    date    DateTime    @db.Date
+}

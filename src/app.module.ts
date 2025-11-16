@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { GamesModule } from './games/games.module';
 import { UsersGamesModule } from './users_games/users_games.module';
 import { AdminModule } from './admin/admin.module';
+import { AnnouncementsModule } from './announcements/announcements.module';
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { AdminModule } from './admin/admin.module';
         GamesModule,
         UsersGamesModule,
         AdminModule,
+        AnnouncementsModule,
     ],
     controllers: [AppController],
     providers: [AppService, DatabaseService],
