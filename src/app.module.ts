@@ -12,6 +12,7 @@ import { GamesModule } from './games/games.module';
 import { UsersGamesModule } from './users_games/users_games.module';
 import { AdminModule } from './admin/admin.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
     imports: [
@@ -25,6 +26,7 @@ import { AnnouncementsModule } from './announcements/announcements.module';
         UsersGamesModule,
         AdminModule,
         AnnouncementsModule,
+        ChatModule,
     ],
     controllers: [AppController],
     providers: [AppService, DatabaseService],
