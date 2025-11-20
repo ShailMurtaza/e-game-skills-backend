@@ -6,12 +6,10 @@ import {
     ConnectedSocket,
     OnGatewayConnection,
     OnGatewayDisconnect,
-    WsResponse,
 } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
 import { ConnectedUsersService } from './connected-users.service';
 import { ChatService } from './chat.service';
-import { from, map, Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import * as cookie from 'cookie';
 import { IncomingMessage } from 'http';
@@ -35,7 +33,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         const cookies = cookie.parse(req.headers.cookie);
-        console.log('Cookies received:', cookies);
 
         const token = cookies['accessToken'];
 
@@ -46,7 +43,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         try {
             const payload = this.jwtService.verify(token);
-            console.log(payload);
             client.user = payload; // attach user
             this.connectedUsers.add(payload.id, client);
             console.log(`User ${payload.id} connected via WS`);
@@ -65,33 +61,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendMessage')
     async handleMessage(
-        @MessageBody() data: any,
+        @MessageBody() data: { toUserId: number; content: string },
         @ConnectedSocket() client: WebSocket & { user: { id: number } },
     ) {
         const senderId = client.user.id;
 
         // 1. Save message to DB
-        const savedMessage = await this.messagesService.create({
+        const result = await this.messagesService.create({
             senderId,
             receiverId: data.toUserId,
             content: data.content,
         });
 
-        const payload = {
-            id: savedMessage.id,
-            content: savedMessage.content,
-            senderId,
-            receiverId: data.toUserId,
-        };
-
         // 2. Send to receiver if online
         const receiverSockets = this.connectedUsers.getSockets(data.toUserId);
         for (const socket of receiverSockets) {
-            socket.send(JSON.stringify({ event: 'newMessage', data: payload }));
+            socket.send(JSON.stringify({ event: 'newMessage', data: result }));
         }
 
         // 3. Send back acknowledgment to sender
-        client.send(JSON.stringify({ event: 'messageSent', data: payload }));
+        client.send(JSON.stringify({ event: 'messageSent', data: result }));
 
         // 4. If receiver offline → will see when they come online (via REST API)
     }

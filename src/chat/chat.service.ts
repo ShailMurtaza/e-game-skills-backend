@@ -9,20 +9,24 @@ export class ChatService {
         receiverId: number;
         content: string;
     }) {
-        return this.databaseService.messages.create({
+        const user = await this.databaseService.user.findUnique({
+            where: {
+                id: data.receiverId,
+            },
+        });
+        if (!user) return { message: "User doesn't exist", error: true };
+        const message = await this.databaseService.messages.create({
             data: {
                 content: data.content,
                 sender: { connect: { id: data.senderId } },
                 receiver: { connect: { id: data.receiverId } },
             },
             include: {
-                sender: {
-                    select: { id: true, username: true },
-                },
                 receiver: {
                     select: { id: true, username: true },
                 },
             },
         });
+        return { message: null, erorr: false, data: message };
     }
 }

@@ -2,11 +2,6 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocket } from 'ws';
 
-interface ConnectedUser {
-    userId: number;
-    socket: WebSocket;
-}
-
 @Injectable()
 export class ConnectedUsersService {
     private connected = new Map<number, Set<WebSocket>>();

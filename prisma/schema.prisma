@@ -134,6 +134,7 @@ model Messages {
     sender_id   Int
     receiver_id Int
     content String  @db.Text
+    read    Boolean @default(false)
     timestamp   DateTime    @default(now())
     sender User    @relation("SentMessage", fields: [sender_id], references: [id], onDelete: Cascade)
     receiver User    @relation("ReceivedMessage", fields: [receiver_id], references: [id], onDelete: Cascade)

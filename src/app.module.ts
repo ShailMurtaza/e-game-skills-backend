@@ -13,6 +13,7 @@ import { UsersGamesModule } from './users_games/users_games.module';
 import { AdminModule } from './admin/admin.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { ChatModule } from './chat/chat.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { ChatModule } from './chat/chat.module';
         AdminModule,
         AnnouncementsModule,
         ChatModule,
+        MessagesModule,
     ],
     controllers: [AppController],
     providers: [AppService, DatabaseService],
