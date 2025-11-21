@@ -23,10 +23,28 @@ export class ChatService {
             },
             include: {
                 receiver: {
-                    select: { id: true, username: true },
+                    select: { id: true, username: true, avatar: true },
+                },
+                sender: {
+                    select: { id: true, username: true, avatar: true },
                 },
             },
         });
-        return { message: null, erorr: false, data: message };
+
+        const receiver_avatar = message.receiver.avatar
+            ? Buffer.from(message.receiver.avatar).toString('hex')
+            : null;
+        const sender_avatar = message.sender.avatar
+            ? Buffer.from(message.sender.avatar).toString('hex')
+            : null;
+        return {
+            message: null,
+            erorr: false,
+            data: {
+                ...message,
+                receiver: { ...message.receiver, avatar: receiver_avatar },
+                sender: { ...message.sender, avatar: sender_avatar },
+            },
+        };
     }
 }
