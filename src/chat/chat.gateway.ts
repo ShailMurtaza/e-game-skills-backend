@@ -13,6 +13,7 @@ import { ChatService } from './chat.service';
 import { JwtService } from '@nestjs/jwt';
 import * as cookie from 'cookie';
 import { IncomingMessage } from 'http';
+import { stringify } from 'querystring';
 
 @WebSocketGateway(3002, { transports: ['websocket'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -66,22 +67,40 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
         const senderId = client.user.id;
 
-        // 1. Save message to DB
         const result = await this.messagesService.create({
             senderId,
             receiverId: data.toUserId,
             content: data.content,
         });
 
-        // 2. Send to receiver if online
         const receiverSockets = this.connectedUsers.getSockets(data.toUserId);
         for (const socket of receiverSockets) {
             socket.send(JSON.stringify({ event: 'newMessage', data: result }));
         }
 
-        // 3. Send back acknowledgment to sender
         client.send(JSON.stringify({ event: 'messageSent', data: result }));
+    }
 
-        // 4. If receiver offline → will see when they come online (via REST API)
+    @SubscribeMessage('isOnline')
+    async handleIsOnline(
+        @MessageBody() users: number[],
+        @ConnectedSocket() client: WebSocket & { user: { id: number } },
+    ) {
+        if (users) {
+            const result = users.map((id: number) => ({
+                id: id,
+                online: this.connectedUsers.isOnline(id),
+            }));
+            client.send(
+                JSON.stringify({
+                    event: 'isOnline',
+                    data: {
+                        error: false,
+                        message: null,
+                        data: result,
+                    },
+                }),
+            );
+        }
     }
 }
