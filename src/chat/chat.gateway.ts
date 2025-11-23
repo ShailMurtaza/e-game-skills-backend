@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             this.connectedUsers.add(payload.id, client);
             console.log(`User ${payload.id} connected via WS`);
         } catch (err) {
-            console.log(err, 'Invalid/expired token');
+            // console.log(err, 'Invalid/expired token');
             client.close(1008, 'Unauthorized: Invalid token');
         }
     }
