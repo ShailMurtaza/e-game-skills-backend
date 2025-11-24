@@ -5,6 +5,7 @@ import { ConnectedUsersService } from './connected-users.service';
 import { DatabaseModule } from 'src/database/database.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MessagesModule } from 'src/messages/messages.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             }),
             inject: [ConfigService],
         }),
+        MessagesModule,
     ],
     providers: [ChatGateway, ChatService, ConnectedUsersService],
 })

@@ -61,7 +61,6 @@ export class MessagesService {
     }
 
     async unreadCount(user_id: number) {
-        console.log(user_id);
         const result = await this.databaseService.messages.count({
             where: {
                 AND: [
@@ -74,7 +73,6 @@ export class MessagesService {
                 ],
             },
         });
-        console.log(result);
         return result;
     }
 }

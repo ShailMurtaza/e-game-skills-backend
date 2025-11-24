@@ -47,4 +47,22 @@ export class ChatService {
             },
         };
     }
+
+    async setRead(msg_user_id: number, user_id: number) {
+        await this.databaseService.messages.updateMany({
+            where: {
+                AND: [
+                    {
+                        receiver_id: user_id,
+                    },
+                    {
+                        sender_id: msg_user_id,
+                    },
+                ],
+            },
+            data: {
+                read: true,
+            },
+        });
+    }
 }

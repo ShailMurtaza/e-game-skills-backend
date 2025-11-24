@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as cookie from 'cookie';
 import { IncomingMessage } from 'http';
 import { stringify } from 'querystring';
+import { MessagesService } from 'src/messages/messages.service';
 
 @WebSocketGateway(3002, { transports: ['websocket'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -22,7 +23,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     constructor(
         private connectedUsers: ConnectedUsersService,
-        private messagesService: ChatService,
+        private chatService: ChatService,
+        private messagesService: MessagesService,
         private jwtService: JwtService,
     ) {}
 
@@ -67,7 +69,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
         const senderId = client.user.id;
 
-        const result = await this.messagesService.create({
+        const result = await this.chatService.create({
             senderId,
             receiverId: data.toUserId,
             content: data.content,
@@ -102,5 +104,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 }),
             );
         }
+    }
+
+    @SubscribeMessage('setRead')
+    async setRead(
+        @MessageBody() data: number,
+        @ConnectedSocket() client: WebSocket & { user: { id: number } },
+    ) {
+        await this.chatService.setRead(data, client.user.id);
+        const unreadMsg = await this.messagesService.unreadCount(
+            client.user.id,
+        );
+        client.send(
+            JSON.stringify({
+                event: 'setUnread',
+                data: {
+                    error: false,
+                    message: null,
+                    data: unreadMsg,
+                },
+            }),
+        );
     }
 }
