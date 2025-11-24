@@ -13,7 +13,6 @@ import { ChatService } from './chat.service';
 import { JwtService } from '@nestjs/jwt';
 import * as cookie from 'cookie';
 import { IncomingMessage } from 'http';
-import { stringify } from 'querystring';
 import { MessagesService } from 'src/messages/messages.service';
 
 @WebSocketGateway(3002, { transports: ['websocket'] })
@@ -48,7 +47,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const payload = this.jwtService.verify(token);
             client.user = payload; // attach user
             this.connectedUsers.add(payload.id, client);
-            console.log(`User ${payload.id} connected via WS`);
         } catch (err) {
             // console.log(err, 'Invalid/expired token');
             client.close(1008, 'Unauthorized: Invalid token');
@@ -58,7 +56,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleDisconnect(client: WebSocket & { user?: { id: number } }) {
         if (client.user?.id) {
             this.connectedUsers.remove(client.user.id, client);
-            console.log(`User ${client.user.id} disconnected`);
         }
     }
 

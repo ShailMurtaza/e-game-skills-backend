@@ -14,6 +14,7 @@ import { AdminModule } from './admin/admin.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { ChatModule } from './chat/chat.module';
 import { MessagesModule } from './messages/messages.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
     imports: [
@@ -29,6 +30,7 @@ import { MessagesModule } from './messages/messages.module';
         AnnouncementsModule,
         ChatModule,
         MessagesModule,
+        ReportsModule,
     ],
     controllers: [AppController],
     providers: [AppService, DatabaseService],
