@@ -61,18 +61,20 @@ export class MessagesService {
     }
 
     async unreadCount(user_id: number) {
-        const result = await this.databaseService.messages.count({
+        const unreadCounts = await this.databaseService.messages.groupBy({
+            by: ['sender_id'],
             where: {
-                AND: [
-                    {
-                        receiver_id: user_id,
-                    },
-                    {
-                        read: false,
-                    },
-                ],
+                receiver_id: user_id,
+                read: false,
+            },
+            _count: {
+                _all: true,
             },
         });
-        return result;
+        const formatedUnreadCounts = unreadCounts.map((data) => ({
+            sender_id: data.sender_id,
+            unreadMsgs: data._count._all,
+        }));
+        return formatedUnreadCounts;
     }
 }
