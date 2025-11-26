@@ -78,4 +78,70 @@ export class AdminService {
         });
         return true;
     }
+
+    async getConversation(sender_id: number, receiver_id: number) {
+        const sender = await this.databaseService.user.findUnique({
+            where: {
+                id: sender_id,
+            },
+            select: {
+                id: true,
+                username: true,
+                avatar: true,
+                email: true,
+                role: true,
+                notes: true,
+                banned: true,
+            },
+        });
+        const receiver = await this.databaseService.user.findUnique({
+            where: {
+                id: receiver_id,
+            },
+            select: {
+                id: true,
+                username: true,
+                avatar: true,
+                email: true,
+                role: true,
+                notes: true,
+                banned: true,
+            },
+        });
+        if (!sender || !receiver) {
+            throw new NotFoundException('Sender or Receiver not found');
+        }
+        const conversation = await this.databaseService.messages.findMany({
+            where: {
+                OR: [
+                    { sender_id: sender_id, receiver_id: receiver_id },
+                    { sender_id: receiver_id, receiver_id: sender_id },
+                ],
+            },
+            select: {
+                id: true,
+                content: true,
+                sender_id: true,
+                receiver_id: true,
+                read: true,
+                timestamp: true,
+            },
+        });
+
+        return {
+            sender: {
+                ...sender,
+                avatar: sender.avatar
+                    ? Buffer.from(sender.avatar).toString('hex')
+                    : null,
+            },
+            receiver: {
+                ...receiver,
+                avatar: receiver.avatar
+                    ? Buffer.from(receiver.avatar).toString('hex')
+                    : null,
+            },
+            conversation: conversation,
+        };
+    }
 }

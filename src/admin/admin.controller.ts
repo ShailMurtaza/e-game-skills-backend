@@ -22,6 +22,7 @@ import {
     UpdateAnnouncementDto,
 } from 'src/announcements/dto/create-announcement.dto';
 import { AnnouncementsService } from 'src/announcements/announcements.service';
+import { ConversationGetDto } from './dto/conversation.dto';
 
 @Roles(Role.admin)
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -72,5 +73,13 @@ export class AdminController {
     async deleteAnnouncement(@Param('id', ParseIntPipe) id: number) {
         const result = await this.announcementService.remove(id);
         if (result) return { message: 'Announcement Deleted' };
+    }
+
+    @Post('conversation')
+    async getConversation(@Body() data: ConversationGetDto) {
+        return await this.adminService.getConversation(
+            data.sender_id,
+            data.receiver_id,
+        );
     }
 }
