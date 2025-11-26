@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateContactDto } from './dto/contacts.dto';
 
@@ -23,5 +27,17 @@ export class ContactsService {
             },
         });
         return { max_pages: max_pages, contacts: contacts };
+    }
+
+    async delete(id: number) {
+        try {
+            return await this.databaseService.contacts.delete({
+                where: {
+                    id: id,
+                },
+            });
+        } catch (e: any) {
+            throw new BadRequestException('ERROR');
+        }
     }
 }

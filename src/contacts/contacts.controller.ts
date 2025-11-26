@@ -2,7 +2,10 @@ import {
     Body,
     Controller,
     DefaultValuePipe,
+    Delete,
     Get,
+    Param,
+    ParseIntPipe,
     Post,
     Query,
     UseGuards,
@@ -29,5 +32,13 @@ export class ContactsController {
     @Get()
     async getContacts(@Query('page', new DefaultValuePipe(1)) page: number) {
         return await this.contactsService.read(page);
+    }
+
+    @Roles(Role.admin)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Delete('/:id')
+    async deleteContact(@Param('id', ParseIntPipe) id: number) {
+        const result = await this.contactsService.delete(id);
+        if (result) return { message: 'Message Deleted' };
     }
 }
