@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import {
     UserReportsCreateInput,
     UserReportsWhereInput,
@@ -38,5 +42,18 @@ export class ReportsService {
             max_pages: max_pages,
             reports: reports,
         };
+    }
+
+    async updateReport(report_id: number, is_reviewed: boolean) {
+        const result = await this.databaseService.userReports.update({
+            where: {
+                id: report_id,
+            },
+            data: {
+                is_reviewed: is_reviewed,
+            },
+        });
+        if (result) return { message: 'Updated!' };
+        else throw new BadRequestException('Something went wrong');
     }
 }
