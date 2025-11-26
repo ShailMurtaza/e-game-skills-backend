@@ -156,3 +156,11 @@ model UserReports {
     reporter    User    @relation("SentReports", fields: [reporter_id], references: [id], onDelete: Cascade)
     target    User    @relation("ReceivedReports", fields: [target_id], references: [id], onDelete: Cascade)
 }
+
+model Contacts {
+    id  Int @id @default(autoincrement())
+    email   String  @db.VarChar(100)
+    name    String  @db.VarChar(50)
+    message String  @db.Text
+    timestamp   DateTime    @default(now())
+}
