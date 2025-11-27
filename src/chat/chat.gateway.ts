@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as cookie from 'cookie';
 import { IncomingMessage } from 'http';
 import { MessagesService } from 'src/messages/messages.service';
+import { AireportsService } from 'src/aireports/aireports.service';
 
 @WebSocketGateway(3002, { transports: ['websocket'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -21,10 +22,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     server: Server;
 
     constructor(
-        private connectedUsers: ConnectedUsersService,
-        private chatService: ChatService,
-        private messagesService: MessagesService,
-        private jwtService: JwtService,
+        private readonly connectedUsers: ConnectedUsersService,
+        private readonly chatService: ChatService,
+        private readonly messagesService: MessagesService,
+        private readonly jwtService: JwtService,
+        private readonly aiReports: AireportsService,
     ) {}
 
     handleConnection(client: WebSocket & { user?: any }, req: IncomingMessage) {
@@ -78,6 +80,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         client.send(JSON.stringify({ event: 'messageSent', data: result }));
+
+        if (result.data)
+            this.aiReports.report(result.data.id, result.data.content);
     }
 
     @SubscribeMessage('isOnline')

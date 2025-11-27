@@ -139,8 +139,10 @@ model Messages {
     content String  @db.Text
     read    Boolean @default(false)
     timestamp   DateTime    @default(now())
+
     sender User    @relation("SentMessage", fields: [sender_id], references: [id], onDelete: Cascade)
     receiver User    @relation("ReceivedMessage", fields: [receiver_id], references: [id], onDelete: Cascade)
+    AIReport    AIReports?
 }
 
 model UserReports {
@@ -155,6 +157,16 @@ model UserReports {
 
     reporter    User    @relation("SentReports", fields: [reporter_id], references: [id], onDelete: Cascade)
     target    User    @relation("ReceivedReports", fields: [target_id], references: [id], onDelete: Cascade)
+}
+
+model AIReports {
+    id  Int @id @default(autoincrement())
+    target_message_id  Int  @unique
+    timestamp   DateTime    @default(now())
+    is_reviewed Boolean @default(false)
+    toxicity    Float
+
+    message Messages    @relation(fields: [target_message_id], references: [id], onDelete: Cascade)
 }
 
 model Contacts {

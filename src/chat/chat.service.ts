@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { CreatedMessage } from 'src/messages/dto/create-message.dto';
 
 @Injectable()
 export class ChatService {
@@ -15,21 +16,22 @@ export class ChatService {
             },
         });
         if (!user) return { message: "User doesn't exist", error: true };
-        const message = await this.databaseService.messages.create({
-            data: {
-                content: data.content,
-                sender: { connect: { id: data.senderId } },
-                receiver: { connect: { id: data.receiverId } },
-            },
-            include: {
-                receiver: {
-                    select: { id: true, username: true, avatar: true },
+        const message: CreatedMessage =
+            await this.databaseService.messages.create({
+                data: {
+                    content: data.content,
+                    sender: { connect: { id: data.senderId } },
+                    receiver: { connect: { id: data.receiverId } },
                 },
-                sender: {
-                    select: { id: true, username: true, avatar: true },
+                include: {
+                    receiver: {
+                        select: { id: true, username: true, avatar: true },
+                    },
+                    sender: {
+                        select: { id: true, username: true, avatar: true },
+                    },
                 },
-            },
-        });
+            });
 
         const receiver_avatar = message.receiver.avatar
             ? Buffer.from(message.receiver.avatar).toString('hex')
