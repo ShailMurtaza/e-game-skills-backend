@@ -40,6 +40,8 @@ export class AuthService {
         if (user) {
             if (user.verified === false) {
                 throw new UnauthorizedException('Verify Email Address');
+            } else if (user.banned) {
+                throw new UnauthorizedException('You are banned');
             }
             return this.createJwtToken(user);
         }
@@ -50,16 +52,17 @@ export class AuthService {
         const user = await this.usersService.findOne({
             id: user_id,
         });
+        let page: string = '';
         if (user) {
-            var page = '';
-            if (user.role == Role.pending) {
-                var page = 'select_role';
+            if (user.banned) page = 'auth?error=You are banned';
+            else if (user.role == Role.pending) {
+                page = 'select_role';
             } else if (user.role === Role.player) {
-                var page = 'player_dashboard';
+                page = 'player_dashboard';
             } else if (user.role === Role.team) {
-                var page = 'team_dashboard';
+                page = 'team_dashboard';
             } else if (user.role === Role.admin) {
-                var page = 'admin_panel';
+                page = 'admin_panel';
             }
             return {
                 accessToken: this.createJwtToken(user),

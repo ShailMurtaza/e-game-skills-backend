@@ -19,6 +19,7 @@ import { DiscordAuthGuard } from './guards/discord-auth/discord-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
+import { BannedGuard } from './guards/banned/banned.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -31,9 +32,10 @@ export class AuthController {
             this.configService.getOrThrow<string>('FRONTEND_URL');
     }
 
+    @UseGuards(BannedGuard)
     @HttpCode(200)
     @Get('me')
-    @UseGuards(JwtAuthGuard) // your existing JWT guard
+    @UseGuards(JwtAuthGuard)
     getProfile(@Req() req) {
         const profile = this.authService.getProfile(req.user.userId);
         return profile;
