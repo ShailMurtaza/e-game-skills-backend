@@ -77,24 +77,6 @@ export class UsersController {
         return { message: 'Role has been set', role: role };
     }
 
-    @Patch(':id')
-    update(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() updateUserDto: UpdateUserDto,
-    ) {
-        return this.usersService.update(id, updateUserDto);
-    }
-
-    @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) {
-        return this.usersService.remove(id);
-    }
-
-    @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.usersService.findOne({ id: id });
-    }
-
     @UseGuards(JwtAuthGuard)
     @Post('update_profile')
     @UseInterceptors(
