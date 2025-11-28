@@ -1,5 +1,10 @@
 import { InferenceClient } from '@huggingface/inference';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -7,6 +12,7 @@ import { DatabaseService } from 'src/database/database.service';
 export class AireportsService {
     private readonly client: InferenceClient;
     private readonly model: string;
+    private readonly reports_per_page = 3;
     constructor(
         private readonly config: ConfigService,
         private readonly databaseService: DatabaseService,
@@ -45,5 +51,68 @@ export class AireportsService {
                 },
             });
         }
+    }
+
+    async getReports(page: number, filter: Record<string, any>) {
+        const total_reports = await this.databaseService.aIReports.count({
+            where: filter,
+        });
+        if (!total_reports) throw new NotFoundException('No Reports Found');
+        const max_pages = Math.ceil(total_reports / this.reports_per_page);
+        if (page < 1 || page > max_pages)
+            throw new NotFoundException('Invalid Page');
+
+        const reports = await this.databaseService.aIReports.findMany({
+            where: filter,
+            include: {
+                message: {
+                    include: {
+                        sender: {
+                            select: {
+                                id: true,
+                                username: true,
+                            },
+                        },
+                        receiver: {
+                            select: {
+                                id: true,
+                                username: true,
+                            },
+                        },
+                    },
+                },
+            },
+            take: this.reports_per_page,
+            skip: (page - 1) * this.reports_per_page,
+        });
+
+        const formated_reports = reports.map((r) => ({
+            id: r.id,
+            timestamp: r.timestamp,
+            is_reviewed: r.is_reviewed,
+            toxicity: r.toxicity,
+            message: r.message.content,
+            msg_sender_user: r.message.sender,
+            msg_receiver_user: r.message.receiver,
+        }));
+
+        return {
+            max_pages: max_pages,
+            reports: formated_reports,
+        };
+    }
+
+    async update(report_id: number, is_reviewed: boolean) {
+        const result = await this.databaseService.aIReports.update({
+            where: {
+                id: report_id,
+            },
+            data: {
+                is_reviewed: is_reviewed,
+            },
+        });
+
+        if (result) return { message: 'Updated!' };
+        else throw new BadRequestException('Something went wrong');
     }
 }

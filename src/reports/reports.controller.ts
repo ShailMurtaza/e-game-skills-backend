@@ -38,7 +38,6 @@ export class ReportsController {
     @Post('getReports')
     async getReports(
         @Body() filter: Record<string, any>,
-        @Req() req: any,
         @Query('page', new DefaultValuePipe(1)) page: number,
     ) {
         return this.reportsService.getReports(page, filter);
@@ -49,8 +48,6 @@ export class ReportsController {
     @Patch()
     async updateReport(
         @Body() data: { report_id: number; is_reviewed: boolean },
-        @Req() req: any,
-        @Query('page', new DefaultValuePipe(1)) page: number,
     ) {
         return this.reportsService.updateReport(
             data.report_id,

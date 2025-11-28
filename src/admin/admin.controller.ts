@@ -10,6 +10,7 @@ import {
     Delete,
     Param,
     ParseIntPipe,
+    NotFoundException,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Roles } from 'src/auth/roles.decorator';
@@ -47,7 +48,7 @@ export class AdminController {
         @Body() filter: Record<string, any>,
         @Query('page', new DefaultValuePipe(1)) page: number,
     ) {
-        page = Math.max(1, page);
+        if (page < 1) throw new NotFoundException('Invalid Page');
         return await this.adminService.getUsers(page, filter);
     }
 

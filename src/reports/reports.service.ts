@@ -23,11 +23,11 @@ export class ReportsService {
         const reportsWhereFilter: UserReportsWhereInput = {};
         if (filter.hasOwnProperty('is_reviewed'))
             reportsWhereFilter['is_reviewed'] = filter.is_reviewed;
-        const total_users = await this.databaseService.userReports.count({
+        const total_reports = await this.databaseService.userReports.count({
             where: reportsWhereFilter,
         });
-        if (!total_users) throw new NotFoundException('No Reports Found');
-        const max_pages = Math.ceil(total_users / this.reports_per_page);
+        if (!total_reports) throw new NotFoundException('No Reports Found');
+        const max_pages = Math.ceil(total_reports / this.reports_per_page);
         if (page > max_pages)
             throw new NotFoundException('Invalid Page Number');
         const reports = await this.databaseService.userReports.findMany({
