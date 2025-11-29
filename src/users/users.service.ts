@@ -135,6 +135,10 @@ export class UsersService {
     async generateOtp(email: string) {
         let user = await this.findOne({ email: email });
         if (!user) throw new BadRequestException('Email not found');
+        if (user.provider !== null)
+            throw new BadRequestException(
+                `This account uses OAuth. Please log in with your provider: ${user.provider}`,
+            );
         const otp = this.otpService.generate(email);
         const sendEmailDto: SendEmailDto = {
             recipients: [user.email],
