@@ -8,7 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { OtpService } from 'src/otp/otp.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { Provider, Role } from 'generated/prisma/enums';
+import { Provider, Role } from 'src/generated/prisma/enums';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

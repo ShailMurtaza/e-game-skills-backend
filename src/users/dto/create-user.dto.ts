@@ -7,7 +7,7 @@ import {
     IsBoolean,
     IsNumber,
 } from 'class-validator';
-import { Provider, Role } from 'generated/prisma/client';
+import { Provider, Role } from 'src/generated/prisma/client';
 
 export class CreateUserDto {
     @IsString()

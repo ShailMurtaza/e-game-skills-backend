@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
-import { Provider } from 'generated/prisma/enums';
+import { Provider } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {

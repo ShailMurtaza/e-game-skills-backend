@@ -13,7 +13,7 @@ import {
 import { EmailService } from 'src/email/email.service';
 import { SendEmailDto } from 'src/email/dto/email.dto';
 import * as argon2 from 'argon2';
-import { Role } from 'generated/prisma/enums';
+import { Role } from 'src/generated/prisma/enums';
 
 export interface UpdateProfileResult {
     message: string;

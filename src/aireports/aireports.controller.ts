@@ -10,7 +10,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'generated/prisma/enums';
+import { Role } from 'src/generated/prisma/enums';
 import { AireportsService } from './aireports.service';
 
 @Roles(Role.admin)

@@ -1,4 +1,4 @@
-import { GameGetPayload } from 'generated/prisma/models';
+import { GameGetPayload } from 'src/generated/prisma/models';
 
 export type GameWithAttributes = GameGetPayload<{
     include: { attributes: true };

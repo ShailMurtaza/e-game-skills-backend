@@ -8,7 +8,7 @@ import {
     UserGameUpdateInput,
     UserGameWhereInput,
     WinsLossCreateWithoutUser_gameInput,
-} from 'generated/prisma/models';
+} from 'src/generated/prisma/models';
 import { DatabaseService } from 'src/database/database.service';
 import SearchDataDto from './dto/search.dto';
 

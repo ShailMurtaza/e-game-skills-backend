@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-discord';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
-import { Provider } from 'generated/prisma/enums';
+import { Provider } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class DiscordStrategy extends PassportStrategy(Strategy) {

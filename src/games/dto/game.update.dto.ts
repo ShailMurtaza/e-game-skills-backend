@@ -6,7 +6,7 @@ import {
     IsString,
     IsOptional,
 } from 'class-validator';
-import { GameAttribute } from 'generated/prisma/client';
+import { GameAttribute } from 'src/generated/prisma/client';
 
 interface GameAttributeWithAction extends GameAttribute {
     action: 'create' | 'update' | 'delete';

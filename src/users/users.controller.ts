@@ -3,9 +3,7 @@ import {
     Get,
     Post,
     Body,
-    Patch,
     Param,
-    Delete,
     ParseIntPipe,
     Query,
     UseGuards,
@@ -27,7 +25,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'generated/prisma/enums';
+import { Role } from 'src/generated/prisma/enums';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';

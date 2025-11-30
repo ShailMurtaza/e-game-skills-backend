@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { GameCreateInput, GameUpdateInput } from 'generated/prisma/models';
+import { GameCreateInput, GameUpdateInput } from 'src/generated/prisma/models';
 import GameUpdateDto from './dto/game.update.dto';
 import { GameWithAttributes } from './dto/game.dto';
 

@@ -1,4 +1,4 @@
-import { MessagesGetPayload } from 'generated/prisma/models';
+import { MessagesGetPayload } from 'src/generated/prisma/models';
 
 export type CreatedMessage = MessagesGetPayload<{
     include: {

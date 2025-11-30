@@ -9,9 +9,9 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
-import type { GameCreateInput } from 'generated/prisma/models';
+import type { GameCreateInput } from 'src/generated/prisma/models';
 import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'generated/prisma/enums';
+import { Role } from 'src/generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import GameUpdateDto from './dto/game.update.dto';

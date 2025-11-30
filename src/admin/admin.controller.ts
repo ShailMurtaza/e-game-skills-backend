@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'generated/prisma/enums';
+import { Role } from 'src/generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { UpdateUserDto } from 'src/users/dto/create-user.dto';

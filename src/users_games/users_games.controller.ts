@@ -15,7 +15,7 @@ import { UsersGamesService } from './users_games.service';
 import type {
     UserGameCreateInput,
     UserGameUpdateInput,
-} from 'generated/prisma/models';
+} from 'src/generated/prisma/models';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import SearchDataDto from './dto/search.dto';
 

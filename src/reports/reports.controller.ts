@@ -14,7 +14,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { CreateReportDto } from './dto/user-reports.dto';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'generated/prisma/enums';
+import { Role } from 'src/generated/prisma/enums';
 
 @UseGuards(JwtAuthGuard)
 @Controller('reports')
