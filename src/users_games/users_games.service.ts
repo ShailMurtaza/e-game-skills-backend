@@ -36,7 +36,11 @@ export class UsersGamesService {
                 },
                 custom_attributes: true,
                 Links: true,
-                WinsLoss: true,
+                WinsLoss: {
+                    orderBy: {
+                        date: 'asc',
+                    },
+                },
                 game: true,
             },
         });
@@ -258,7 +262,10 @@ export class UsersGamesService {
             });
         }
 
-        var user_games: any[] = [];
+        var user_games: {
+            id: number;
+            user_games: { game: { name: string } }[];
+        }[] = [];
 
         const promises = results.map(async (result) => {
             const avatar: string | null = result.avatar
@@ -282,7 +289,7 @@ export class UsersGamesService {
                     },
                 },
             });
-            user_games.push(games);
+            if (games) user_games.push(games);
         });
         await Promise.all(promises);
         return {
