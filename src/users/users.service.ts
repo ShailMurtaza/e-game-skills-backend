@@ -174,6 +174,7 @@ export class UsersService {
                 avatar: true,
                 description: true,
                 email: true,
+                banned: true,
             },
         });
         if (user === null) {

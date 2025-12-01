@@ -16,6 +16,7 @@ export class MessagesService {
                 id: true,
                 username: true,
                 avatar: true,
+                banned: true,
                 received_messages: {
                     where: {
                         sender_id: user_id,

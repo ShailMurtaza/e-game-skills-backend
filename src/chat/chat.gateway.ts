@@ -15,6 +15,7 @@ import * as cookie from 'cookie';
 import { IncomingMessage } from 'http';
 import { MessagesService } from 'src/messages/messages.service';
 import { AireportsService } from 'src/aireports/aireports.service';
+import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway(3002, { transports: ['websocket'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -27,6 +28,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private readonly messagesService: MessagesService,
         private readonly jwtService: JwtService,
         private readonly aiReports: AireportsService,
+        private readonly userService: UsersService,
     ) {}
 
     handleConnection(client: WebSocket & { user?: any }, req: IncomingMessage) {
@@ -67,22 +69,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @ConnectedSocket() client: WebSocket & { user: { id: number } },
     ) {
         const senderId = client.user.id;
+        const receiverId = data.toUserId;
+        const senderUser = await this.userService.findOne({ id: senderId });
+        const receiverUser = await this.userService.findOne({ id: receiverId });
 
-        const result = await this.chatService.create({
-            senderId,
-            receiverId: data.toUserId,
-            content: data.content,
-        });
+        if (!receiverUser.banned && !senderUser.banned) {
+            const result = await this.chatService.create({
+                senderId,
+                receiverId: receiverId,
+                content: data.content,
+            });
 
-        const receiverSockets = this.connectedUsers.getSockets(data.toUserId);
-        for (const socket of receiverSockets) {
-            socket.send(JSON.stringify({ event: 'newMessage', data: result }));
+            const receiverSockets = this.connectedUsers.getSockets(receiverId);
+            for (const socket of receiverSockets) {
+                socket.send(
+                    JSON.stringify({ event: 'newMessage', data: result }),
+                );
+            }
+
+            client.send(JSON.stringify({ event: 'messageSent', data: result }));
+
+            if (result.data)
+                this.aiReports.report(result.data.id, result.data.content);
+        } else {
+            client.send(
+                JSON.stringify({
+                    event: null,
+                    data: {
+                        error: true,
+                        message: receiverUser.banned
+                            ? 'Receiver is banned'
+                            : 'You are banned',
+                    },
+                }),
+            );
         }
-
-        client.send(JSON.stringify({ event: 'messageSent', data: result }));
-
-        if (result.data)
-            this.aiReports.report(result.data.id, result.data.content);
     }
 
     @SubscribeMessage('isOnline')

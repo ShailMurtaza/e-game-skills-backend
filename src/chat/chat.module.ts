@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MessagesModule } from 'src/messages/messages.module';
 import { AireportsModule } from 'src/aireports/aireports.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { AireportsModule } from 'src/aireports/aireports.module';
         }),
         MessagesModule,
         AireportsModule,
+        UsersModule,
     ],
     providers: [ChatGateway, ChatService, ConnectedUsersService],
 })
