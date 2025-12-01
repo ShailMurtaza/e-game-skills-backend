@@ -35,7 +35,7 @@ export class ReportsService {
             take: this.reports_per_page,
             skip: (page - 1) * this.reports_per_page,
             orderBy: {
-                timestamp: 'asc',
+                timestamp: 'desc',
             },
         });
         return {

@@ -84,6 +84,9 @@ export class AireportsService {
             },
             take: this.reports_per_page,
             skip: (page - 1) * this.reports_per_page,
+            orderBy: {
+                timestamp: 'desc',
+            },
         });
 
         const formated_reports = reports.map((r) => ({

@@ -18,7 +18,11 @@ export class AnnouncementsService {
     }
 
     async findAll() {
-        return await this.databaseService.announcements.findMany();
+        return await this.databaseService.announcements.findMany({
+            orderBy: {
+                date: 'desc',
+            },
+        });
     }
 
     findOne(id: number) {
